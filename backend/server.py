@@ -6,7 +6,7 @@ from app import create_embedding, ask_claude
 
 
 class ChatRequest(BaseModel):
-    message: str
+    messages: list
 
 
 app = FastAPI()
@@ -23,10 +23,11 @@ app.add_middleware(
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-
-    response = ask_claude(request.message)
-
-    return {"response": response.content[0].text}
+    try:
+        response = ask_claude(request.messages)
+        return {"response": response.content[0].text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

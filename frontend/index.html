@@ -238,21 +238,26 @@
             const $chatInput = $('.chat-input');
             const $sendButton = $('.send-button');
             const $typingIndicator = $('.typing-indicator');
-            let isWaitingForResponse = false;
+            
+            let conversationHistory = [];
 
             function scrollToBottom() {
                 $chatMessages.scrollTop($chatMessages[0].scrollHeight);
             }
 
             function addMessage(content, isUser = false) {
+                const message = {
+                    content: content,
+                    isUser: isUser
+                };
+                conversationHistory.push(message);
+                
                 const messageHtml = `
                     <div class="message ${isUser ? 'user-message' : 'bot-message'}">
-                        <div class="message-content">
-                            ${content}
-                        </div>
+                        <div class="message-content">${content}</div>
                     </div>
                 `;
-                $typingIndicator.before(messageHtml);
+                $chatMessages.append(messageHtml);
                 scrollToBottom();
             }
 
@@ -266,37 +271,42 @@
             }
 
             async function sendMessage(message) {
-                if (isWaitingForResponse || !message.trim()) return;
+                if (!message.trim()) return;
 
-                // Add user message
+                // Clear input
+                $chatInput.val('');
+
+                // Add user message to chat
                 addMessage(message, true);
-
-                // Clear input and disable
-                $chatInput.val('').prop('disabled', true);
-                $sendButton.prop('disabled', true);
-                isWaitingForResponse = true;
 
                 // Show typing indicator
                 showTypingIndicator();
 
-                const response = await fetch('http://localhost:8000/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: message })
-                });
+                try {
+                    const response = await fetch('http://localhost:8000/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messages: conversationHistory
+                        }),
+                    });
 
-                const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
 
-                // Hide typing indicator and add bot response
-                hideTypingIndicator();
-                addMessage(data.response);
-
-                // Re-enable input
-                $chatInput.prop('disabled', false).focus();
-                $sendButton.prop('disabled', false);
-                isWaitingForResponse = false;
+                    const data = await response.json();
+                    
+                    // Hide typing indicator and add bot response
+                    hideTypingIndicator();
+                    addMessage(data.response, false);
+                } catch (error) {
+                    console.error('Error:', error);
+                    hideTypingIndicator();
+                    addMessage('Sorry, there was an error processing your message.', false);
+                }
             }
 
             // Handle send button click
