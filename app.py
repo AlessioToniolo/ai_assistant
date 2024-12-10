@@ -1,23 +1,30 @@
 import openai
 import dotenv
 import os
+import anthropic
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+dotenv.load_dotenv()
 
-import requests
+client = anthropic.Anthropic(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+)
 
-def ask_openai(prompt):
-    data = {
-        "model": "gpt-4o-mini",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.7
-    }
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {openai.api_key}"
-    }
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
-    return response.json()["choices"][0]["message"]["content"]
+message = client.messages.create(
+    model="claude-3-5-sonnet-latest",
+    max_tokens=1000,
+    temperature=0,
+    system="You are a world-class poet. Respond only with short poems.",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Why is the ocean salty?"
+                }
+            ]
+        }
+    ]
+)
 
-print(ask_openai("Say this is a test!"))
-
+print(message.content)
