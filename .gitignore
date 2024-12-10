@@ -29,3 +29,5 @@ coverage.xml
 env
 venv
 migrations
+.env
+*.env
