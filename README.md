@@ -1,11 +1,13 @@
-# RAG Custom Assistant
+# AI Assistant
+
+Chatbot with custom RAG pipeline and custom vector store. Designed to be as lightweight as possible.
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/AlessioToniolo/obsidianbrain.git
-cd obsidianbrain
+git clone https://github.com/AlessioToniolo/ai_assistant.git
+cd ai_assistant
 ```
 
 2. Create and activate a virtual environment (recommended):
@@ -27,7 +29,6 @@ Then edit `.env` with your configuration:
 ```
 ANTHROPIC_API_KEY="your-api-key-here"
 OPENAI_API_KEY="your-api-key-here"
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 ```
 
 ## Running the Application
@@ -35,5 +36,10 @@ OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 1. Start the backend server:
 ```bash
 cd backend
-python app.py
+python server.py
+```
+
+2. Start the frontend:
+```bash
+python -m http.server 8080
 ```

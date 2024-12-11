@@ -2,7 +2,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from app import create_embedding, ask_claude
+from app import ask_rag
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ChatRequest(BaseModel):
@@ -10,11 +13,9 @@ class ChatRequest(BaseModel):
 
 
 app = FastAPI()
-
-# Configure CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origin
+    allow_origins=["*"],  # replace with specific origin in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,10 +25,28 @@ app.add_middleware(
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
-        response = ask_claude(request.messages)
-        return {"response": response.content[0].text}
+        logger.info(f"Received chat request with {len(request.messages)} messages")
+        response = ask_rag(request.messages)
+        logger.info("Successfully processed chat request")
+
+        return JSONResponse(
+            content={"response": response.content[0].text},
+            status_code=200,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error processing chat request: {str(e)}", exc_info=True)
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500,
+            headers={
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        )
 
 
 if __name__ == "__main__":

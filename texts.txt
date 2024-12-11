@@ -1,0 +1,5 @@
+Pick and place robot arm moving components from conveyor belt to assembly station
+Automated welding robot performing precision welds on automotive chassis
+Quality control robot using computer vision to inspect manufactured parts
+Collaborative robot assisting human workers in packaging finished products
+Mobile robot navigating factory floor to transport materials between workstations
