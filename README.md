@@ -33,13 +33,14 @@ OPENAI_API_KEY="your-api-key-here"
 
 ## Running the Application
 
-1. Start the backend server:
+* Start the backend server:
 ```bash
 cd backend
 python server.py
 ```
 
-2. Start the frontend:
+* Start the frontend:
 ```bash
+cd frontend
 python -m http.server 8080
 ```
