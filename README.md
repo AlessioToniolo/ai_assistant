@@ -2,6 +2,8 @@
 
 Chatbot with custom RAG pipeline and custom vector store. Designed to be as lightweight as possible.
 
+![System Overview](system_overview.png)
+
 ## Installation
 
 1. Clone the repository:
